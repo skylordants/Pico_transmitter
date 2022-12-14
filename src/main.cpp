@@ -5,7 +5,9 @@
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
+#include "hardware/i2c.h"
 
+#include "bmp280.h"
 
 #define RF_BIT 150  //The symbol bit length in us
 #define RF_SYMBOL 4*RF_BIT  //The symbol length
@@ -25,7 +27,6 @@
 #define AHT20_ADDRESS 0x38
 #define AHT20_REG_STATUS 0x71
 
-#define BMP280_ADDRESS 0x76
 
 void send_bit (bool bit) {
   gpio_put(TRANSMITTER_PIN, 1);
@@ -78,47 +79,9 @@ void send_message (uint8_t len, char *buffer) {
   }
 }
 
-// Write 1 byte to the specified register
-int reg_write( i2c_inst_t *i2c, const uint addr, const uint8_t reg, uint8_t *buf, const uint8_t nbytes) {
-  int num_bytes_read = 0;
-  uint8_t msg[nbytes + 1];
-
-  // Check to make sure caller is sending 1 or more bytes
-  if (nbytes < 1) {
-      return 0;
-  }
-
-  // Append register address to front of data packet
-  msg[0] = reg;
-  for (int i = 0; i < nbytes; i++) {
-      msg[i + 1] = buf[i];
-  }
-
-  // Write data to register(s) over I2C
-  i2c_write_blocking(i2c, addr, msg, (nbytes + 1), false);
-
-  return num_bytes_read;
-}
-
-// Read byte(s) from specified register. If nbytes > 1, read from consecutive
-// registers.
-int reg_read(i2c_inst_t *i2c, const uint addr, const uint8_t reg, uint8_t *buf, const uint8_t nbytes) {
-
-  int num_bytes_read = 0;
-
-  // Check to make sure caller is asking for 1 or more bytes
-  if (nbytes < 1) {
-      return 0;
-  }
-
-  // Read data from register(s) over I2C
-  i2c_write_blocking(i2c, addr, &reg, 1, true);
-  num_bytes_read = i2c_read_blocking(i2c, addr, buf, nbytes, false);
-
-  return num_bytes_read;
-}
 
 bool start_aht_20 () {
+  return true;
 }
 
 int main() {
@@ -153,7 +116,7 @@ int main() {
   gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
   gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
 
-  reg_read(i2c, AHT20_ADDRESS, AHT20_REG_STATUS, data, 1);
+  /*reg_read(i2c, AHT20_ADDRESS, AHT20_REG_STATUS, data, 1);
 
   printf("%x", data[0]);
 
@@ -199,7 +162,18 @@ int main() {
     printf("\n");
     sleep_ms(5000);
 
+  }*/
+
+  bmp280_setup(i2c);
+  int32_t temperature = 0;
+  uint32_t pressure = 0;
+
+  while (true) {
+    bmp280_measure(i2c, &temperature, &pressure);
+    printf("Temperature: %f, Pressure %f\n", (float)temperature/100, (float)pressure/256);
+    sleep_ms(500);
   }
+  
 
   return 0;
 }
