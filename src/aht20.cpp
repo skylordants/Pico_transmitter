@@ -1,3 +1,6 @@
+// Inspiration: https://github.com/DFRobot/DFRobot_AHT20/blob/master/DFRobot_AHT20.cpp
+// https://files.seeedstudio.com/wiki/Grove-AHT20_I2C_Industrial_Grade_Temperature_and_Humidity_Sensor/AHT20-datasheet-2020-4-16.pdf
+
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 

@@ -1,4 +1,5 @@
-//Inspiration: https://github.com/BoschSensortec/BMP2-Sensor-API/
+// Inspiration: https://github.com/BoschSensortec/BMP2-Sensor-API/
+// https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf
 
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
@@ -48,7 +49,6 @@ void bmp280_read_compensation_constants(i2c_inst_t *i2c) {
 
 //TODO: Check if setup worked
 bool bmp280_setup(i2c_inst_t *i2c) {
-  //https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf
   uint8_t data[2] = {0b10110111, 0b01101000};
 
   // Write both CTRL_MEAS and CONFIG registers
