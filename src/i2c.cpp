@@ -2,7 +2,7 @@
 #include "hardware/i2c.h"
 
 // Write 1 byte to the specified register
-int reg_write( i2c_inst_t *i2c, const uint addr, const uint8_t reg, uint8_t *buf, const uint8_t nbytes) {
+int i2c_reg_write( i2c_inst_t *i2c, const uint addr, const uint8_t reg, uint8_t *buf, const uint8_t nbytes) {
   int num_bytes_read = 0;
   uint8_t msg[nbytes + 1];
 
@@ -25,7 +25,7 @@ int reg_write( i2c_inst_t *i2c, const uint addr, const uint8_t reg, uint8_t *buf
 
 // Read byte(s) from specified register. If nbytes > 1, read from consecutive
 // registers.
-int reg_read(i2c_inst_t *i2c, const uint addr, const uint8_t reg, uint8_t *buf, const uint8_t nbytes) {
+int i2c_reg_read(i2c_inst_t *i2c, const uint addr, const uint8_t reg, uint8_t *buf, const uint8_t nbytes) {
 
   int num_bytes_read = 0;
 

@@ -31,7 +31,7 @@ int16_t dig_P9;
 void bmp280_read_compensation_constants(i2c_inst_t *i2c) {
   uint8_t data[24];
 
-  reg_read(i2c, BMP280_ADDRESS, BMP280_CONSTANTS, data, 24);
+  i2c_reg_read(i2c, BMP280_ADDRESS, BMP280_CONSTANTS, data, 24);
 
   dig_T1 = (uint16_t)data[1]<<8 | data[0];
   dig_T2 = (int16_t)data[3]<<8 | data[2];
@@ -52,7 +52,7 @@ bool bmp280_setup(i2c_inst_t *i2c) {
   uint8_t data[2] = {0b10110111, 0b01101000};
 
   // Write both CTRL_MEAS and CONFIG registers
-  reg_write(i2c, BMP280_ADDRESS, BMP280_CTRL_MEAS, data, 2);
+  i2c_reg_write(i2c, BMP280_ADDRESS, BMP280_CTRL_MEAS, data, 2);
 
   bmp280_read_compensation_constants(i2c);
   return true;
@@ -93,7 +93,7 @@ uint32_t bmp280_compensate_pressure (int32_t adc_P) {
 bool bmp280_measure(i2c_inst_t *i2c, int32_t *temperature, uint32_t *pressure) {
   uint8_t data[6];
 
-  reg_read(i2c, BMP280_ADDRESS, BMP280_MEASUREMENTS, data, 6);
+  i2c_reg_read(i2c, BMP280_ADDRESS, BMP280_MEASUREMENTS, data, 6);
 
   int32_t adc_T = (int32_t)data[3]<<12 | (int32_t)data[4]<<4 | data[5]>>4, adc_P = (int32_t)data[0]<<12 | (int32_t)data[1]<<4 | data[2]>>4;
 
