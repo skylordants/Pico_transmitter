@@ -1,3 +1,5 @@
+//Inspiration: https://github.com/BoschSensortec/BMP2-Sensor-API/
+
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 
