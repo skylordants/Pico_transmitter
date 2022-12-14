@@ -8,6 +8,7 @@
 #include "hardware/i2c.h"
 
 #include "bmp280.h"
+#include "aht20.h"
 
 #define RF_BIT 150  //The symbol bit length in us
 #define RF_SYMBOL 4*RF_BIT  //The symbol length
@@ -22,10 +23,6 @@
 #define TRANSMITTER_PIN 14
 #define SDA_PIN 26
 #define SCL_PIN 27
-
-
-#define AHT20_ADDRESS 0x38
-#define AHT20_REG_STATUS 0x71
 
 
 void send_bit (bool bit) {
@@ -80,9 +77,6 @@ void send_message (uint8_t len, char *buffer) {
 }
 
 
-bool start_aht_20 () {
-  return true;
-}
 
 int main() {
   // Setup stuff
@@ -116,64 +110,20 @@ int main() {
   gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
   gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
 
-  /*reg_read(i2c, AHT20_ADDRESS, AHT20_REG_STATUS, data, 1);
-
-  printf("%x", data[0]);
-
-  while (data[0] != 0x18) {
-    printf("Device not initialized\n");
-    data[0] = 0x08;
-    data[1] = 0x00;
-
-    reg_write(i2c, AHT20_ADDRESS, 0xBE, &data[0], 3);
-    data[0] = 0;
-
-    sleep_ms(10);
-    reg_read(i2c, AHT20_ADDRESS, AHT20_REG_STATUS, data, 1);
-  }
-
-  sleep_ms(10);
-
-  while (true){
-    printf("Starting read\n");
-    data[0] = 0x33;
-    data[1] = 0x00;
-
-    reg_write(i2c, AHT20_ADDRESS, 0xAC, &data[0], 3);
-    while (true) {
-      sleep_ms(100);
-      reg_read(i2c, AHT20_ADDRESS, AHT20_REG_STATUS, data, 1);
-
-      if ((data[0]&1) == 0) {
-        break;
-      }
-      printf("Wrong status\n");
-    }
-    for (int i = 0; i < 10; i++) {
-      data[i] = 0;
-    }
-
-    int num_bytes_read = i2c_read_blocking(i2c, AHT20_ADDRESS, data, 6, false);
-
-    printf("Read %u bytes\n", num_bytes_read);
-    for (int i = 0; i < 6; i++) {
-      printf(" %x", data[i]);
-    }
-    printf("\n");
-    sleep_ms(5000);
-
-  }*/
+  aht20_setup(i2c);
+  uint32_t temperature = 0;
+  uint32_t humidity = 0;
 
   bmp280_setup(i2c);
-  int32_t temperature = 0;
+  int32_t temperature_2 = 0;
   uint32_t pressure = 0;
 
-  while (true) {
-    bmp280_measure(i2c, &temperature, &pressure);
-    printf("Temperature: %f, Pressure %f\n", (float)temperature/100, (float)pressure/256);
+  while (true){
+    aht20_measure(i2c, &temperature, &humidity);
+    bmp280_measure(i2c, &temperature_2, &pressure);
+    printf("BMP280 - Temperature: %f°C, Pressure %f Pa\n", (float)temperature_2/100, (float)pressure/256);
+    printf("AHT20 - Temperature: %f°C, Humidity %f%%\n", aht20_calculate_temperature(temperature), aht20_calculate_humidity(humidity));
     sleep_ms(500);
   }
-  
-
   return 0;
 }
