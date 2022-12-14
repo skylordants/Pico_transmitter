@@ -65,10 +65,10 @@ void send_start() {
 }
 
 void send_message (uint8_t len, char *buffer) {
-  send_preample();
-  send_start();
-  send_byte(len);
   for (int cycles = 0; cycles < RF_REP; cycles++) {
+    send_preample();
+    send_start();
+    send_byte(len);
     for (int byte = 0; byte < len; byte++) {
       send_byte(buffer[byte]);
     }
@@ -97,9 +97,6 @@ int main() {
 
   // Buffer to store raw reads
   uint8_t data[10];
-
-  // Initialize chosen serial port
-  stdio_init_all();
 
   sleep_ms(2000);
 

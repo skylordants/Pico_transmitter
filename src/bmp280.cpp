@@ -90,7 +90,7 @@ uint32_t bmp280_compensate_pressure (int32_t adc_P) {
 }
 
 //TODO: find errors and stuff
-bool bmp280_measure(i2c_inst_t *i2c, int32_t *temperature, uint32_t* pressure) {
+bool bmp280_measure(i2c_inst_t *i2c, int32_t *temperature, uint32_t *pressure) {
   uint8_t data[6];
 
   reg_read(i2c, BMP280_ADDRESS, BMP280_MEASUREMENTS, data, 6);
