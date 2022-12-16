@@ -2,7 +2,6 @@
 // https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf
 
 #include "pico/stdlib.h"
-#include "hardware/i2c.h"
 
 #include "bmp280.h"
 #include "i2c.h"
@@ -28,10 +27,10 @@ int16_t dig_P7;
 int16_t dig_P8;
 int16_t dig_P9;
 
-void bmp280_read_compensation_constants(i2c_inst_t *i2c) {
+void bmp280_read_compensation_constants() {
   uint8_t data[24];
 
-  i2c_reg_read(i2c, BMP280_ADDRESS, BMP280_CONSTANTS, data, 24);
+  i2c_reg_read(BMP280_ADDRESS, BMP280_CONSTANTS, data, 24);
 
   dig_T1 = (uint16_t)data[1]<<8 | data[0];
   dig_T2 = (int16_t)data[3]<<8 | data[2];
@@ -48,13 +47,13 @@ void bmp280_read_compensation_constants(i2c_inst_t *i2c) {
 }
 
 //TODO: Check if setup worked
-bool bmp280_setup(i2c_inst_t *i2c) {
+bool bmp280_setup() {
   uint8_t data[2] = {0b10110111, 0b01101000};
 
   // Write both CTRL_MEAS and CONFIG registers
-  i2c_reg_write(i2c, BMP280_ADDRESS, BMP280_CTRL_MEAS, data, 2);
+  i2c_reg_write(BMP280_ADDRESS, BMP280_CTRL_MEAS, data, 2);
 
-  bmp280_read_compensation_constants(i2c);
+  bmp280_read_compensation_constants();
   return true;
 }
 
@@ -90,10 +89,10 @@ uint32_t bmp280_compensate_pressure (int32_t adc_P) {
 }
 
 //TODO: find errors and stuff
-bool bmp280_measure(i2c_inst_t *i2c, int32_t *temperature, uint32_t *pressure) {
+bool bmp280_measure(int32_t *temperature, uint32_t *pressure) {
   uint8_t data[6];
 
-  i2c_reg_read(i2c, BMP280_ADDRESS, BMP280_MEASUREMENTS, data, 6);
+  i2c_reg_read(BMP280_ADDRESS, BMP280_MEASUREMENTS, data, 6);
 
   int32_t adc_T = (int32_t)data[3]<<12 | (int32_t)data[4]<<4 | data[5]>>4, adc_P = (int32_t)data[0]<<12 | (int32_t)data[1]<<4 | data[2]>>4;
 
