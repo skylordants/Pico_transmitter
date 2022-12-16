@@ -61,14 +61,25 @@ void rf_send_start() {
 	}
 }
 
+uint8_t calculate_error_detection (char *buffer, uint8_t len) {
+	uint8_t res = 0;
+	for (int i = 0; i < len; i++) {
+		res ^= buffer[i];
+	}
+
+	return res;
+}
+
 void rf_send_message (char *buffer, uint8_t len) {
+	uint8_t error_det = calculate_error_detection(buffer, len);
 	for (int cycles = 0; cycles < RF_REP; cycles++) {
 		rf_send_preample();
 		rf_send_start();
-		rf_send_byte(len);
+		rf_send_byte(len+1);
 		for (int byte = 0; byte < len; byte++) {
 			rf_send_byte(buffer[byte]);
 		}
+		rf_send_byte(error_det);
 		sleep_us(RF_REP_PAUSE);
 	}
 }
