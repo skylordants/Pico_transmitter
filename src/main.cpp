@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
@@ -23,8 +24,8 @@ int main() {
 	bmp280_setup();
 	rf_transmitter_setup();
 
-	int len = 6;
-	char msg[7] = "Tere!\n";
+	int len = 24;
+	char msg[25] = "SENSORS:";
 
 	uint32_t temperature = 0;
 	uint32_t humidity = 0;
@@ -32,13 +33,18 @@ int main() {
 	uint32_t pressure = 0;
 
 	while (true) {
-		rf_send_message(msg, len);
 		aht20_measure(&temperature, &humidity);
 		bmp280_measure(&temperature_2, &pressure);
 		printf("BMP280 - Temperature: %f°C, Pressure %f Pa\n", (float)temperature_2/100, (float)pressure/256);
 		printf("AHT20 - Temperature: %f°C, Humidity %f%%\n", aht20_calculate_temperature(temperature), aht20_calculate_humidity(humidity));
+		
+		memcpy(msg+8, &temperature, 4);
+		memcpy(msg+12, &humidity, 4);
+		memcpy(msg+16, &temperature_2, 4);
+		memcpy(msg+20, &pressure, 4);
+		rf_send_message(msg, len);
 		sleep_ms(500);
 	}
-	
+
 	return 0;
 }

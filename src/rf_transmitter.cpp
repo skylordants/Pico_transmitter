@@ -3,12 +3,12 @@
 
 #include "rf_transmitter.h"
 
-#define RF_BIT 150  //The symbol bit length in us
+#define RF_BIT 250  //The symbol bit length in us
 #define RF_SYMBOL 4*RF_BIT  //The symbol length
 #define RF_ZERO 1*RF_BIT
 #define RF_ONE 3*RF_BIT
 #define RF_REP 3
-#define RF_REP_PAUSE 2*RF_SYMBOL
+#define RF_REP_PAUSE 10*RF_SYMBOL
 
 #define RF_PREAMPLE 16  //Number of 1 bits before a transmission
 #define RF_START 4  //Number of 0 and 1 bit pairs before a packet
